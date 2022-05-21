@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "appJuegos",
-    "slug": "appJuegos",
-    "version": "1.0.0",
+    "name": "appAlarmaRobo",
+    "slug": "appAlarmaRobo",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splash/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#83B8BD"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -17,13 +17,17 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.appalarma.robo",
+      "buildNumber": "1.0.2"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
-      }
+        "backgroundColor": "#83B8BD"
+      },
+      "package": "com.appalarma.robo",
+      "versionCode": 3
     },
     "web": {
       "favicon": "./assets/favicon.png"
