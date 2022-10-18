@@ -2,7 +2,7 @@
   "expo": {
     "name": "appAlarmaRobo",
     "slug": "appAlarmaRobo",
-    "version": "1.0.2",
+    "version": "1.0.6",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -19,7 +19,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.appalarma.robo",
-      "buildNumber": "1.0.2"
+      "buildNumber": "1.0.6"
     },
     "android": {
       "adaptiveIcon": {
@@ -27,7 +27,7 @@
         "backgroundColor": "#83B8BD"
       },
       "package": "com.appalarma.robo",
-      "versionCode": 3
+      "versionCode": 6
     },
     "web": {
       "favicon": "./assets/favicon.png"

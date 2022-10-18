@@ -36,9 +36,9 @@ export default function PruebaGyroscope() {
         }
         if (gyroscopeData.z > 1) {
           console.log("izquierda ", gyroscopeData);
-
-          emitirSonido("left");
           takePicture();
+          emitirSonido("left");
+
           //playSound('izq')
         }
         if (gyroscopeData.x > 1) {

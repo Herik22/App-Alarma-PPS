@@ -8,11 +8,18 @@ import Register from "../screens/Register";
 import Splash from "../screens/Splash";
 import { useLogin } from "../context/LoginProvider";
 import PruebaGyroscope from "../screens/PruebaGyroscope";
+import PruebaAcele from "../screens/pruebaAcele";
+
 const Stack = createNativeStackNavigator();
 
 const Init = () => {
   return (
     <Stack.Navigator initialRouteName="Splash">
+      <Stack.Screen
+        component={PruebaAcele}
+        options={{ headerShown: false }}
+        name="prueba"
+      />
       <Stack.Screen
         component={Splash}
         options={{ headerShown: false }}

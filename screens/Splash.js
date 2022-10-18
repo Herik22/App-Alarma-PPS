@@ -5,6 +5,7 @@ import {
   StatusBar,
   Image,
   Dimensions,
+  Animated,
 } from "react-native";
 import React, { Component, useEffect } from "react";
 import { useLogin } from "../context/LoginProvider";
@@ -17,8 +18,21 @@ export default Splash = (props) => {
   useEffect(() => {
     setTimeout(() => {
       navigation.navigate("Login");
-    }, 3500);
+    }, 3000);
+    spring();
   }, []);
+  let springValue = new Animated.Value(0.3);
+
+  const spring = () => {
+    springValue.setValue(0.3);
+    Animated.spring(springValue, {
+      toValue: 1,
+      friction: 0.8,
+      useNativeDriver: false,
+    }).start(() => {
+      spring();
+    });
+  };
 
   return (
     <View
@@ -29,14 +43,30 @@ export default Splash = (props) => {
         alignContent: "center",
       }}
     >
-      <Image
-        source={require("../assets/splash/alarm.gif")}
-        resizeMode={"cover"}
-        style={{
-          width: "100%", //Dimensions.get("window").width * 0.8,
-          height: Dimensions.get("window").height * 1,
-        }}
-      />
+      <Animated.View style={{ transform: [{ scale: springValue }] }}>
+        <Text style={{ textAlign: "center", color: "black", fontSize: 35 }}>
+          Herik Arismendy
+        </Text>
+        <Text style={{ textAlign: "center", color: "black", fontSize: 35 }}>
+          División 4a
+        </Text>
+        <View
+          style={{
+            width: "100%",
+            height: Dimensions.get("window").height * 0.3,
+            marginTop: 20,
+          }}
+        >
+          <Image
+            source={require("../assets/logos/iconlogo.png")}
+            style={{
+              width: "100%", //Dimensions.get("window").width * 0.8,
+              height: "100%",
+              resizeMode: "contain",
+            }}
+          />
+        </View>
+      </Animated.View>
     </View>
   );
 

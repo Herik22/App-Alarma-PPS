@@ -168,7 +168,8 @@ const Login = (props) => {
           alignSelf: "center",
           justifyContent: "center",
           margin: 10,
-          borderRadius: 0,
+          flexDirection: "row",
+          alignItems: "center",
         }}
         onPress={() => {
           numberAction != 0 ? action() : action(numberAction);
@@ -182,6 +183,44 @@ const Login = (props) => {
             fontWeight: "bold",
           }}
         >
+          {txtName}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const btnInvited = (
+    color,
+    txtName,
+    action,
+    numberAction,
+    nameIcon = "man"
+  ) => {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          numberAction != 0 ? action() : action(numberAction);
+        }}
+        style={{
+          height: Dimensions.get("window").height * 0.05,
+          width: Dimensions.get("window").width * 0.8,
+          marginVertical: 10,
+          flexDirection: "row",
+          alignItems: "center",
+          borderWidth: 1,
+          borderColor: color,
+          borderRadius: 20,
+          alignSelf: "center",
+          paddingHorizontal: 20,
+        }}
+      >
+        <Entypo
+          name={nameIcon}
+          size={20}
+          color={color}
+          style={{ marginRight: 10 }}
+        />
+        <Text style={{ color: color, fontSize: 20, fontWeight: "bold" }}>
           {" "}
           {txtName}{" "}
         </Text>
@@ -203,38 +242,6 @@ const Login = (props) => {
       setPassword("");
       setLoading(false);
     }, 2500);
-  };
-  const btnInvited = (number, txtName) => {
-    return (
-      <TouchableOpacity
-        style={{
-          height: "40%",
-          width: "30%",
-          backgroundColor: "white",
-          alignSelf: "center",
-          justifyContent: "center",
-          margin: 10,
-          borderRadius: 10,
-          borderColor: ColorsPPS.azul,
-          borderWidth: 1,
-        }}
-        onPress={() => {
-          onpressInvited(number);
-        }}
-      >
-        <Text
-          style={{
-            textAlign: "center",
-            color: ColorsPPS.azul,
-            fontSize: 15,
-            fontWeight: "bold",
-          }}
-        >
-          {" "}
-          {txtName}{" "}
-        </Text>
-      </TouchableOpacity>
-    );
   };
 
   const LoginValidation = yup.object({
@@ -261,6 +268,7 @@ const Login = (props) => {
             <Input
               label="Correo Electrónico"
               labelStyle={{ color: ColorsPPS.gris }}
+              errorStyle={{ height: 0 }}
               style={{ width: "100%", padding: 10 }}
               inputContainerStyle={{ borderColor: ColorsPPS.gris }}
               leftIcon={<Entypo name="user" size={20} color={ColorsPPS.gris} />}
@@ -274,7 +282,7 @@ const Login = (props) => {
               keyboardType="email-address"
             />
             {formikprops.touched.email && (
-              <View style={{ borderWidth: 0 }}>
+              <View style={{ borderWidth: 0, alignItems: "flex-start" }}>
                 <Text style={[styles.errorText]}>
                   {formikprops.touched.email && formikprops.errors.email}
                 </Text>
@@ -284,6 +292,7 @@ const Login = (props) => {
               label="Contraseña"
               labelStyle={{ color: ColorsPPS.gris }}
               containerStyle={{}}
+              errorStyle={{ height: 0 }}
               inputContainerStyle={{
                 color: ColorsPPS.gris,
                 borderColor: ColorsPPS.gris,
@@ -311,7 +320,7 @@ const Login = (props) => {
               }
             />
             {formikprops.touched.password && (
-              <View style={{ borderWidth: 0 }}>
+              <View style={{ borderWidth: 0, alignItems: "flex-start" }}>
                 <Text style={[styles.errorText]}>
                   {formikprops.touched.password && formikprops.errors.password}
                 </Text>
@@ -397,32 +406,29 @@ const Login = (props) => {
       <View
         style={{
           flex: 0.3,
-          borderWidth: 0,
+          borderTopRightRadius: 20,
+          borderTopLeftRadius: 20,
+          backgroundColor: "white",
           width: "100%",
           justifyContent: "space-evenly",
           padding: 10,
         }}
       >
-        {btnLogin(
-          ColorsPPS.verdeFluorescente,
-          ColorsPPS.gris,
-          "Invitado 1 ",
-          onpressInvited,
-          1
-        )}
-        {btnLogin(
+        {btnInvited("#06707A", "Invitado 1 ", onpressInvited, 1)}
+        {btnInvited(
           ColorsPPS.militarOscuro,
-          ColorsPPS.gris,
           "Invitado 2",
           onpressInvited,
-          2
+          2,
+          "rocket"
         )}
-        {btnLogin(
+        {btnInvited(
           ColorsPPS.cafe,
-          ColorsPPS.gris,
+
           "Invitado 3",
           onpressInvited,
-          3
+          3,
+          "bug"
         )}
       </View>
       {

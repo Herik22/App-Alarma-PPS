@@ -21,10 +21,11 @@ import { Camera } from "expo-camera";
 
 export default Home = (props) => {
   const { navigation } = props;
-  const { Email_, isLogIn, setIsLogIn } = useLogin();
+  const { setIsLogIn, profile } = useLogin();
   const [loading, setLoading] = useState(false);
   const [loadingMsj, setLoadingMsj] = useState("Cerrando Sesión");
   const [lock, setLock] = useState(false);
+  const [flash, setFlash] = useState(false);
   const [modalPassword, setModalPassword] = useState(false);
   const [data, setData] = useState({
     x: 0,
@@ -39,34 +40,62 @@ export default Home = (props) => {
   const [isCameraReady, setIsCameraReady] = useState(false);
 
   const cameraRef = useRef();
-  const _subscribe = () => {
-    console.log("DISPONIBLE GIROSCOPIO?");
+  //ORIGINAL EL 1
+  const _subscribe1 = () => {
     setSubscription(
       Gyroscope.addListener((gyroscopeData) => {
         if (gyroscopeData.z < -1) {
           console.log("derecha: ", gyroscopeData);
           emitirSonido("rigth");
-          Vibration.vibrate(10000);
+          //Vibration.vibrate(10000);
         }
         if (gyroscopeData.z > 1) {
           console.log("izquierda ", gyroscopeData);
-
           emitirSonido("left");
-
           //playSound('izq')
         }
         if (gyroscopeData.x > 1) {
           console.log("up CELULAR VERTICAL ", gyroscopeData);
           emitirSonido("vertical");
           takePicture();
-
-          //playSound('up')
         }
-        evaluarMovimiento(gyroscopeData);
+
+        //evaluarMovimiento(gyroscopeData);
       })
     );
   };
 
+  const _subscribe = () => {
+    setSubscription(
+      Gyroscope.addListener((gyroscopeData) => {
+        if (gyroscopeData.y > 5) {
+          console.log("derecha: ", gyroscopeData);
+          emitirSonido("rigth");
+          //Vibration.vibrate(10000);
+        }
+        //if (gyroscopeData.z < -5) {
+        if (gyroscopeData.y < -5) {
+          console.log("izquierda ", gyroscopeData);
+          emitirSonido("left");
+          //playSound('izq')
+        }
+        if (gyroscopeData.x > 4) {
+          console.log("up CELULAR VERTICAL ", gyroscopeData);
+          emitirSonido("vertical");
+          setFlash(true);
+          setTimeout(function () {
+            setFlash(false);
+          }, 5000);
+        }
+        if (gyroscopeData.x < -2) {
+          Vibration.vibrate(5000);
+          console.log("horizontal", gyroscopeData);
+        }
+
+        //evaluarMovimiento(gyroscopeData);
+      })
+    );
+  };
   const _unsubscribe = () => {
     subscription && subscription.remove();
     setSubscription(null);
@@ -78,12 +107,12 @@ export default Home = (props) => {
     })();
   });
   useEffect(() => {
+    console.log("profile", profile);
     Gyroscope.setUpdateInterval(100);
     alarm ? _subscribe() : _unsubscribe();
 
     return () => _unsubscribe();
   }, [alarm]);
-
   useEffect(() => {
     return sound
       ? () => {
@@ -102,10 +131,8 @@ export default Home = (props) => {
       const options = { quality: 0.5, base64: true, skipProcessing: true };
 
       const data = await cameraRef.current.takePictureAsync(options);
-      console.log("picture data", data);
     }
   };
-
   if (hasPermission === null) {
     return <View />;
   }
@@ -124,29 +151,6 @@ export default Home = (props) => {
     );
   }
   //  ********************************************************************************
-
-  const evaluarMovimiento = (coordenates) => {
-    if (coordenates.z < -1) {
-      console.log("derecha: ", coordenates);
-      emitirSonido("rigth");
-    }
-    if (coordenates.z > 1) {
-      console.log("izquierda ", coordenates);
-      emitirSonido("left");
-      //playSound('izq')
-    }
-    if (coordenates.x > 1) {
-      console.log("up CELULAR VERTICAL ", coordenates);
-      emitirSonido("vertical");
-      Vibration.vibrate(10000);
-    }
-
-    /*if (coordenates.x < 1) {
-      console.log("up CELULAR HORIZONTAL ", coordenates);
-      emitirSonido("horizontal");
-      //Vibration.vibrate(10000);
-    }*/
-  };
 
   const emitirSonido = async (movimiento) => {
     if (movimiento == "left") {
@@ -173,6 +177,13 @@ export default Home = (props) => {
     if (movimiento == "horizontal") {
       const { sound } = await Audio.Sound.createAsync(
         require("../assets/sonidos/sonidoHorizontal.mp3")
+      );
+      setSound(sound);
+      await sound.playAsync();
+    }
+    if (movimiento == "contraseñaError") {
+      const { sound } = await Audio.Sound.createAsync(
+        require("../assets/sonidos/fondoPolicia.wav")
       );
       setSound(sound);
       await sound.playAsync();
@@ -206,31 +217,48 @@ export default Home = (props) => {
           translucent
           backgroundColor="transparent"
         />
+        {false && (
+          <Camera
+            ref={cameraRef}
+            style={{ flex: 0.001 }}
+            type={Camera.Constants.Type.back}
+            flashMode={Camera.Constants.FlashMode.on}
+            onCameraReady={onCameraReady}
+            onMountError={(error) => {
+              console.log("cammera error", error);
+            }}
+          />
+        )}
         <Camera
-          ref={cameraRef}
-          style={{ flex: 0.001 }}
-          type={Camera.Constants.Type.back}
-          flashMode={Camera.Constants.FlashMode.on}
-          onCameraReady={onCameraReady}
-          onMountError={(error) => {
-            console.log("cammera error", error);
-          }}
-        />
+          style={{ width: 1, height: 1, marginBottom: 0, marginLeft: 0 }}
+          flashMode={
+            flash
+              ? Camera.Constants.FlashMode.torch
+              : Camera.Constants.FlashMode.off
+          }
+        >
+          <View>
+            <TouchableOpacity
+              onPress={() => setFlash(!flash)}
+            ></TouchableOpacity>
+          </View>
+        </Camera>
         {/* ICONO CANDADO */}
         <View
           style={{
-            marginTop: 10,
             width: "100%",
             height: Dimensions.get("window").height * 0.3,
             borderColor: "white",
             justifyContent: "center",
             alignItems: "center",
+            alignContent: "center",
+            borderWidth: 0,
           }}
         >
           <FontAwesome
             name={lock ? "lock" : "unlock"}
-            size={200}
-            color="gray"
+            size={150}
+            color="white"
           />
         </View>
 
@@ -255,59 +283,71 @@ export default Home = (props) => {
             }
           }}
         >
-          <Text
-            style={{
-              textAlign: "center",
-              fontWeight: "bold",
-              fontSize: 20,
-              color: lock ? "black" : "white",
-            }}
-          >
-            {lock ? "DESACTIVAR ALARMA " : "ACTIVAR ALARMA"}
-          </Text>
-        </TouchableOpacity>
-
-        {/* BTN Cerrar Sesion */}
-        <View
-          style={{
-            width: "100%",
-            justifyContent: "center",
-            alignItems: "flex-end",
-          }}
-        >
-          <TouchableOpacity
-            style={{
-              width: Dimensions.get("window").width * 0.3,
-              height: Dimensions.get("window").height * 0.05,
-              backgroundColor: ColorsPPS.verderOliva,
-              borderRadius: 20,
-              borderWidth: 0,
-              justifyContent: "center",
-              alignContent: "center",
-              alignItems: "center",
-              margin: 20,
-            }}
-            onPress={() => {
-              setLoadingMsj("Cerrando Sesión ...");
-              setLoading(true);
-              setTimeout(() => {
-                setIsLogIn(false);
-                navigation.navigate("Login");
-                setLoading(false);
-              }, 2000);
-            }}
-          >
+          {!lock && (
             <Text
               style={{
                 textAlign: "center",
-                color: "white",
                 fontWeight: "bold",
+                fontSize: 20,
+                color: lock ? "black" : "white",
               }}
             >
-              Cerrar Sesión
+              {lock ? "DESACTIVAR ALARMA " : "ACTIVAR ALARMA"}
             </Text>
-          </TouchableOpacity>
-        </View>
+          )}
+          {lock && (
+            <Image
+              source={{
+                uri: "https://c.tenor.com/EDeg5ifIrjQAAAAC/alarm-better-discord.gif",
+              }}
+              style={{ width: "100%", height: "100%", borderRadius: 20 }}
+            />
+          )}
+        </TouchableOpacity>
+
+        {/* BTN Cerrar Sesion */}
+        {!lock && (
+          <View
+            style={{
+              width: "100%",
+              justifyContent: "center",
+              alignItems: "flex-end",
+            }}
+          >
+            <TouchableOpacity
+              style={{
+                width: Dimensions.get("window").width * 0.3,
+                height: Dimensions.get("window").height * 0.05,
+                backgroundColor: ColorsPPS.verderOliva,
+                borderRadius: 20,
+                borderWidth: 0,
+                justifyContent: "center",
+                alignContent: "center",
+                alignItems: "center",
+                margin: 20,
+              }}
+              onPress={() => {
+                setLoadingMsj("Cerrando Sesión ...");
+                setLoading(true);
+                setTimeout(() => {
+                  setIsLogIn(false);
+                  navigation.navigate("Login");
+                  setLoading(false);
+                }, 2000);
+              }}
+            >
+              <Text
+                style={{
+                  textAlign: "center",
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
+                Cerrar Sesión
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </ImageBackground>
 
       {
@@ -321,6 +361,9 @@ export default Home = (props) => {
           setAlarm={setAlarm}
           setLoading={setLoading}
           setLoadingMsj={setLoadingMsj}
+          emitirSonido={emitirSonido}
+          takePicture={takePicture}
+          setFlash={setFlash}
         />
       }
     </View>

@@ -8,8 +8,10 @@ import {
   TextInput,
   Dimensions,
   TouchableOpacity,
-  KeyboardAwareScrollView,
+  Vibration,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
 import { Input } from "@rneui/base";
 import { Ionicons, FontAwesome, Foundation } from "@expo/vector-icons";
 import ColorsPPS from "../../utils/ColorsPPS";
@@ -31,6 +33,9 @@ const ModalPassword = (props) => {
     setAlarm,
     setLoading,
     setLoadingMsj,
+    emitirSonido,
+    takePicture,
+    setFlash,
   } = props;
   const [hidePassword, setHidePassword] = useState(true);
   const [modalClave, setModalClave] = useState(false);
@@ -77,8 +82,10 @@ const ModalPassword = (props) => {
         validationSchema={LoginValidation}
         onSubmit={(values, actions) => {
           setLoadingMsj("Desactivando ...");
-          setLoading(true);
-          if (values.password == profile.clave) {
+
+          if (values.password === profile.clave) {
+            setLoading(true);
+            console.log("COINCIDE");
             setTimeout(() => {
               setLock(!lock);
               setAlarm(!alarm);
@@ -87,10 +94,14 @@ const ModalPassword = (props) => {
               setLoading(false);
             }, 2000);
           } else {
-            setLoading(false);
-            setMsjError("Contraseña erronea");
-            setShowModal(false);
-            //setLoading(false);
+            emitirSonido("contraseñaError");
+            Vibration.vibrate(10000);
+            setFlash(true);
+            setTimeout(function () {
+              setFlash(false);
+            }, 3000);
+            values.password = "";
+
             return;
           }
         }}
@@ -160,87 +171,98 @@ const ModalPassword = (props) => {
         console.log("modal has been close");
       }}
     >
-      <View
-        style={{
-          flex: 1,
-          width: "100%",
-          height: "100%",
-          justifyContent: "center",
-        }}
+      <KeyboardAwareScrollView
+        nestedScrollEnabled={true}
+        style={{ flex: 1, borderWidth: 0 }}
       >
         <View
           style={{
-            width: "70%",
-            height: "55%",
-            alignSelf: "center",
-            backgroundColor: "white",
-            borderRadius: 20,
-            justifyContent: "space-around",
-            padding: 10,
-            borderColor: ColorsPPS.militarOscuro,
-            borderWidth: 1,
+            flex: 1,
+            width: "100%",
+            height: Dimensions.get("window").height,
+            justifyContent: "center",
+            alignContent: "center",
+            alignItems: "center",
           }}
         >
-          {/* CLOSE BTN */}
           <View
             style={{
-              flex: 0.1,
-              width: "100%",
-              alignContent: "flex-start",
-              justifyContent: "center",
+              width: "70%",
+              height: Dimensions.get("window").height * 0.5,
+
+              backgroundColor: "white",
+              borderRadius: 20,
+              justifyContent: "space-around",
+              padding: 10,
+              borderColor: ColorsPPS.militarOscuro,
+              borderWidth: 1,
             }}
           >
-            <FontAwesome
-              name="times"
-              size={30}
-              color="black"
-              onPress={() => {
-                setShowModal(false);
-              }}
-              style={{ alignSelf: "flex-end", paddingRight: 20 }}
-            />
-          </View>
-          {/* IMG LOGO*/}
-          <View
-            style={{
-              flex: 0.4,
-              width: "100%",
-              justifyContent: "center",
-              alignContent: "center",
-              borderWidth: 0,
-            }}
-          >
-            <Image
+            {/* CLOSE BTN */}
+            <View
               style={{
-                //flex: 1,
-                alignSelf: "center",
+                flex: 0.1,
                 width: "100%",
-                height: "100%",
+                alignContent: "flex-start",
+                justifyContent: "center",
               }}
-              resizeMode="contain"
-              source={require("../../assets/logos/iconlogo.png")}
-            />
-            <Text
-              style={{ textAlign: "center", fontWeight: "bold", color: "red" }}
             >
-              {" "}
-              {msjError}{" "}
-            </Text>
-          </View>
-          {/*INPUT*/}
-          <View
-            style={{
-              flex: 0.25,
-              width: "100%",
-              justifyContent: "center",
-              flexDirection: "row",
-              borderWidth: 0,
-            }}
-          >
-            {formLogin()}
+              <FontAwesome
+                name="times"
+                size={30}
+                color="black"
+                onPress={() => {
+                  setShowModal(false);
+                }}
+                style={{ alignSelf: "flex-end", paddingRight: 20 }}
+              />
+            </View>
+            {/* IMG LOGO*/}
+            <View
+              style={{
+                flex: 0.4,
+                width: "100%",
+                justifyContent: "center",
+                alignContent: "center",
+                borderWidth: 0,
+              }}
+            >
+              <Image
+                style={{
+                  //flex: 1,
+                  alignSelf: "center",
+                  width: "100%",
+                  height: "100%",
+                }}
+                resizeMode="contain"
+                source={require("../../assets/logos/iconlogo.png")}
+              />
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  color: "red",
+                }}
+              >
+                {" "}
+                {msjError}{" "}
+              </Text>
+            </View>
+            {/*INPUT*/}
+            <View
+              style={{
+                flex: 0.25,
+                width: "100%",
+                justifyContent: "center",
+                flexDirection: "row",
+                borderWidth: 0,
+              }}
+            >
+              {formLogin()}
+            </View>
           </View>
         </View>
-      </View>
+      </KeyboardAwareScrollView>
     </Modal>
   );
 };
